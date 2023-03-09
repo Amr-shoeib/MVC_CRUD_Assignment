@@ -7,6 +7,11 @@ $users = $data['users'];
 <table>
     <thead>
         <tr>
+
+        <form method="get" action="index.php" name="searchform" id="searchform">
+		<input type="text" name="str" id="str" placeholder="Hit 'Enter' to search...">
+		<input type="submit" name="submit" id="submit" value="search">
+	</form>
             <th>ID</th>
             <th>Last Name</th>
             <th>First Name</th>
