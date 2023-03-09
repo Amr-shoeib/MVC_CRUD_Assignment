@@ -1,10 +1,4 @@
-<?php
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'mid_term_assignment');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-
+<?
 // PDO database connection
 try {
   $db = new PDO('mysql:host='.'localhost'.';dbname='.'mid_term_assignment', 'root', '');

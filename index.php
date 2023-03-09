@@ -1,6 +1,7 @@
 <?php
 $users = $data['users'];
 ?>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 
 <h1>Users</h1>
 <table>

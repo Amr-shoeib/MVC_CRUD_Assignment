@@ -1,89 +1,103 @@
 <?php
+
 class User {
-    private $db;
+    private $id;
+    private $lastName;
+    private $firstName;
+    private $username;
+    private $password;
+    private $photo;
+    private $role;
+    private $pdo;
 
     public function __construct() {
-        $host = "localhost";
-        $dbname = "mid_term_assignment";
-        $user = "username";
-        $pass = "password";
-
-        $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
-
-        $options = [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        ];
-
-        try {
-            $this->db = new PDO($dsn, $user, $pass, $options);
-        } catch (\PDOException $e) {
-            throw new \PDOException($e->getMessage(), (int) $e->getCode());
-        }
+        $this->pdo = new PDO("mysql:host=localhost;dbname=mid_term_assignment;charset=utf8mb4", "root", "");
     }
 
-    public function create($data) {
-        $last_name = $data['last_name'];
-        $first_name = $data['first_name'];
-        $username = $data['username'];
-        $password = $data['password'];
-        $photo = $data['photo'];
-
-        $sql = "INSERT INTO Users (Last_Name, First_Name, Username, Password, Photo) 
-                VALUES (:last_name, :first_name, :username, :password, :photo)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':last_name' => $last_name,
-            ':first_name' => $first_name,
-            ':username' => $username,
-            ':password' => $password,
-            ':photo' => $photo,
-        ]);
-
-        return $stmt->rowCount();
+    // Getters and setters
+    public function getId() {
+        return $this->id;
     }
 
-    public function read() {
-        $sql = "SELECT * FROM Users";
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll();
+    public function setId($id) {
+        $this->id = $id;
     }
 
-    public function update($data) {
-        $id = $data['id'];
-        $last_name = $data['last_name'];
-        $first_name = $data['first_name'];
-        $username = $data['username'];
-        $password = $data['password'];
-        $photo = $data['photo'];
-
-        $sql = "UPDATE Users SET 
-                    Last_Name = :last_name, 
-                    First_Name = :first_name, 
-                    Username = :username, 
-                    Password = :password, 
-                    Photo = :photo
-                WHERE ID = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':id' => $id,
-            ':last_name' => $last_name,
-            ':first_name' => $first_name,
-            ':username' => $username,
-            ':password' => $password,
-            ':photo' => $photo,
-        ]);
-
-        return $stmt->rowCount();
-
-        
+    public function getLastName() {
+        return $this->lastName;
     }
 
+    public function setLastName($lastName) {
+        $this->lastName = $lastName;
+    }
+
+    public function getFirstName() {
+        return $this->firstName;
+    }
+
+    public function setFirstName($firstName) {
+        $this->firstName = $firstName;
+    }
+
+    public function getUsername() {
+        return $this->username;
+    }
+
+    public function setUsername($username) {
+        $this->username = $username;
+    }
+
+    public function getPassword() {
+        return $this->password;
+    }
+
+    public function setPassword($password) {
+        $this->password = $password;
+    }
+
+    public function getPhoto() {
+        return $this->photo;
+    }
+
+    public function setPhoto($photo) {
+        $this->photo = $photo;
+    }
+
+    public function getRole() {
+        return $this->role;
+    }
+
+    public function setRole($role) {
+        $this->role = $role;
+    }
+
+    public function all() {
+        $stmt = $this->pdo->prepare("SELECT Users.*, Roles.Name AS RoleName FROM Users INNER JOIN Roles ON Users.Role = Roles.ID");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Find a user by ID
+    public function find($id) {
+        $stmt = $this->pdo->prepare("SELECT Users.*, Roles.Name AS RoleName FROM Users INNER JOIN Roles ON Users.Role = Roles.ID WHERE Users.ID = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Create a new user
+    public function create() {
+        $stmt = $this->pdo->prepare("INSERT INTO Users (LastName, FirstName, Username, Password, Photo, Role) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$this->lastName, $this->firstName, $this->username, $this->password, $this->photo, $this->role]);
+    }
+
+    // Update a user by ID
+    public function update($id) {
+        $stmt = $this->pdo->prepare("UPDATE Users SET LastName = ?, FirstName = ?, Username = ?, Password = ?, Photo = ?, Role = ? WHERE ID = ?");
+        $stmt->execute([$this->lastName, $this->firstName, $this->username, $this->password, $this->photo, $this->role, $id]);
+    }
+
+    // Delete a user by ID
     public function delete($id) {
-        $sql = "DELETE FROM Users WHERE ID = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id]);
-
-        return $stmt->rowCount();
-    }
+        $stmt = $this->pdo->prepare("DELETE FROM Users WHERE ID = ?");
+        $stmt->execute([$id]);}
 }
